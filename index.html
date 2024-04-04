@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Crypto Trading App</title>
+</head>
+<body>
+    <header>
+        <h1>Crypto Trading App</h1>
+        <p id="balance">Balance: $<span id="suyash">100,000,000</span></p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#" onclick="displayPage('home')">Home</a></li>
+            <li><a href="#" onclick="displayPage('holdings')">Holdings</a></li>
+            <li><a href="#" onclick="displayPage('wishlist')">Wishlist</a></li>
+        </ul>
+    </nav>
+
+    <main id="content">
+    </main>
+
+    <script src="index.js"></script>
+</body>
+</html>
+
+
+<style>
+    body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+
+        nav {
+            background-color: #ddd;
+            padding: 0.5em;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        nav li {
+            margin: 0 1em;
+        }
+
+        nav a {
+            text-decoration: none;
+            padding: 0.5em 1em;
+            border: 2px solid #4CAF50; /* Green Border */
+            border-radius: 5px;
+            color: white; /* Green Text */
+            transition: background-color 0.3s, color 0.3s;
+            background-color: #4CAF50;
+        }
+
+        nav a:hover {
+            background-color: #ddd; /* Green */
+            color: black;
+        }
+
+        main {
+            padding: 1em;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 1em;
+            margin-bottom: 1em;
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        button {
+            background-color: #000000; /* Green */
+            color: white;
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            margin: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049; /* Darker Green on Hover */
+        }
+
+</style>
+
+
+<script>
+    let cryptoData = { 
+    Bitcoin: 10000,
+    Ethereum: 3000,
+    Ripple: 500,
+    Crypto1: 2000,
+    CryptoB:50000,
+    Litecoin: 250,
+    Cardano: 1500,
+    Polkadot: 800,
+    Stellar: 300,
+    Chainlink: 2200,
+    Uniswap: 1000,
+    Dogecoin: 0.5,
+    Solana: 1300,
+    Monero: 400,
+    Tezos: 350,
+    Cosmos: 900,
+    Aave: 500,
+    Maker: 2500,
+    Compound: 750,
+    Yearn: 9000 
+};
+let userBalance = 1000000;
+let userHoldings = {};
+let userWishlist = {};
+let currentCryptoPage = 'home';
+
+document.addEventListener('DOMContentLoaded', () => {
+    displayPage(currentCryptoPage);
+});
+
+function displayPage(page) {
+    currentCryptoPage = page;
+    const content = document.getElementById('content');
+    content.innerHTML = '';
+
+    if (page === 'home') {
+        for (const crypto in cryptoData) {
+            const card = createCryptoCard(crypto, cryptoData[crypto]);
+            content.appendChild(card);
+        }
+    } else if (page === 'holdings') {
+        content.innerHTML = '<h2>Holdings Page</h2>';
+        displayHoldings();
+    } else if (page === 'wishlist') {
+        content.innerHTML = '<h2>Wishlist Page</h2>';
+        displayWishlist();
+    }
+}
+
+function createCryptoCard(crypto, price) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    const title = document.createElement('h2');
+    title.textContent = crypto;
+    card.appendChild(title);
+
+    const priceElement = document.createElement('p');
+    priceElement.textContent = `Price: $${price}`;
+    card.appendChild(priceElement);
+
+    const actions = document.createElement('div');
+    
+    const addToWishlistBtn = createActionButton('Add to Wishlist', () => addToWishlist(crypto));
+    actions.appendChild(addToWishlistBtn);
+
+    const purchaseBtn = createActionButton('Purchase', () => showPurchasePopup(crypto, price));
+    actions.appendChild(purchaseBtn);
+
+    card.appendChild(actions);
+    
+
+
+    return card;
+}
+
+function createActionButton(text, onClick) {
+    const button = document.createElement('button');
+    button.textContent = text;
+    button.addEventListener('click', onClick);
+    return button;
+}
+
+function addToWishlist(crypto) {
+    userWishlist[crypto] = 0;
+    updateWishlistPopup(crypto);
+}
+function removeWishlist(crypto) {
+    userWishlist[crypto]=0;
+    updateWishlistPopup(crypto);
+}
+
+function updateWishlistPopup(crypto) {
+    alert(`Added ${crypto} to wishlist`);
+}
+function updateWishlistPopup(crypto){
+    alert('Removed ${crypto} from wishlist);
+}
+
+function showPurchasePopup(crypto, price) {
+    const quantity = prompt(`Enter the quantity of ${crypto} you want to purchase:`);
+    if (quantity !== null && quantity !== '') {
+        const totalCost = price * parseFloat(quantity);
+        const confirmPurchase = confirm(`Do you want to purchase ${quantity} ${crypto} for $${totalCost}?`);
+        if (confirmPurchase) {
+            executePurchase(crypto, price, parseFloat(quantity));
+        }
+    }
+}
+
+function executePurchase(crypto, price, quantity) {
+    const cost = price * quantity;
+    if (userBalance >= cost) {
+        userBalance -= cost;
+        if (crypto in userHoldings) {
+            userHoldings[crypto] += quantity;
+        } else {
+            userHoldings[crypto] = quantity;
+        }
+        updateBalance();
+        updateHoldings();
+        console.log(`Bought ${quantity} ${crypto} for $${cost}`);
+    } else {
+        alert('Insufficient funds');
+    }
+}
+
+function updateBalance() {
+    document.getElementById('balance').textContent = `Balance: $${userBalance}`;
+}
+
+function updateHoldings() {
+    console.log('Updated holdings:', userHoldings);
+}
+
+function displayHoldings() {
+    const holdingsContent = document.createElement('div');
+    holdingsContent.innerHTML = '<h3>Holdings:</h3>';
+    
+    for (const crypto in userHoldings) {
+        holdingsContent.innerHTML += `<p>${crypto}: ${userHoldings[crypto]}</p>`;
+    }
+
+    document.getElementById('content').appendChild(holdingsContent);
+}
+
+function displayWishlist() {
+    const wishlistContent = document.createElement('div');
+    wishlistContent.innerHTML = '<h3>Wishlist:</h3>';
+    
+    for (const crypto in userWishlist) {
+        wishlistContent.innerHTML += `<p>${crypto}</p>`;
+        wishlistContent.innerHTML 
+    }
+
+    document.getElementById('content').appendChild(wishlistContent);
+    const removefromWishlistBtn = createActionButton('Remove from wishlist', () => removeWishlist(crypto));
+    actions.appendChild(removefromWishlistBtn);
+
+}
+function removeWishlist(crypto){
+    const crypto.removeWishlist
+}
+</script>
